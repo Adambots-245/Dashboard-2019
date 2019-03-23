@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+
+
+	
+	<script type="text/javascript" src="gauge/jquery-min.js"></script>
+	<script type="text/javascript" src="gauge/jquery.transit.min.js"></script>	
+	<script type="text/javascript" src="gauge/js.js"></script>
+	
+	<STYLE TYPE="text/css">
+	.newtext {font-size: 70pt;font-family: arial}
+	
+	
+	</STYLE>
+	
+
+</head>
+<body>
+
+<!-- This starts the NetworkTables websocket, it can be accessed from multiple
+     pages simultaneously -->
+<script src="/networktables/networktables.js"></script>
+
+<!-- Obviously, you will want to copy this file locally in a real 
+     dashboard, as the Driver Station won't have internet access -->
+<script src="/jquery-2.2.4.js"></script>
+
+<!-- utility functions to attach to a camera -->
+<script src="/networktables/camera.js"></script>
+
+<div>
+  Robot: <span id="robotstate">Unknown state</span> @ <span id="robotAddress">disconnected</span>
+  NetTable: <span id="netTable">Unknown state</span><br/>
+  FMS: <span id="FMS">Unknown</span><br/>
+  Voltage: <span id="voltage">Unknown</span><br/>
+  RobotState: <span id="state">Unknown</span><br/>
+  EnabledState: <span id="enabledState">Unknown</span><br/>
+  Match Time: <span CLASS="newtext" id="matchTime" >Unknown</span><br/>
+  <!-- Timer: <span id="timer">99:99</span><br/> -->
+  
+</div>
+
+	<!-- <div class="container">
+		<div class="gauge-a"></div>
+		<div class="gauge-b"></div>
+		<div class="gauge-c"></div>
+		<div class="gauge-data"><h1 id="percent">0%</h1></div>
+	</div> -->
+
+<table id="nt" border=2>
+	<tr>
+		<td>
+		
+				RobotState: <span id="state">Unknown</span>
+				</td>
+				<td>
+				EnabledState: <span id="enabledState">Unknown</span></td>
+				<td>
+				Robot: <span id="robotstate">Unknown state</span> @ <span id="robotAddress">disconnected</span></td>
+  
+				</tr>
+				
+</table>
+	
+Camera:
+
+
+<script type="text/javascript">
+"use strict";
+
+function onRobotConnection(connected) {
+
+
+
+	$('#robotstate').text(connected ? "Connected!" : "Disconnected");
+	$('#robotAddress').text(connected ? NetworkTables.getRobotAddress() : "disconnected");
+	$('#netTable').text(NetworkTables.getValue("/SmartDashboard/arm limit switch", "No Value"))
+	$('#FMS').text(NetworkTables.getValue("/FMSInfo/isRedAlliance", "No Value"))
+	$('#voltage').text(NetworkTables.getValue("/LiveWindow/Ungrouped/PowerDistributionPanel[0]/Voltage"))
+	
+}
+
+$(document).ready(function(){
+    // sets a function that will be called when the robot connects/disconnects
+	NetworkTables.addRobotConnectionListener(onRobotConnection, true);
+	
+	// sets a function that will be called when any NetworkTables key/value changes
+	NetworkTables.addGlobalListener(onValueChanged, true);
+  
+    // will load a camera from the robot's IP address on port 5800
+    //loadCameraOnConnect({
+    //    container: '#camera_container', // where to put the img tag
+    //    proto: null,                    // optional, defaults to http://
+    //    host: '10.2.45.6',                     // optional, if null will use robot's autodetected IP address
+    //    port: 1181,                     // webserver port
+    //    image_url: '/stream.mjpg',   // mjpg stream of camera
+    //    data_url: '/stream.mjpg',      // used to test if connection is up
+    //    wait_img: null,                 // optional img to show when not connected, can use SVG instead
+    //    error_img: null,                // optional img to show when error connecting, can use SVG instead
+    //    attrs: {                        // optional: attributes set on svg or img element
+    //        width: 640,                     // optional, stretches image to this width
+    //        height: 480,                    // optional, stretches image to this width
+    //    }
+        
+    //}); 
+});
+
+function onValueChanged(key, value, isNew) {
+
+	// key thing here: we're using the various NetworkTable keys as
+	// the id of the elements that we're appending, for simplicity. However,
+	// the key names aren't always valid HTML identifiers, so we use
+	// the NetworkTables.keyToId() function to convert them appropriately
+	if (isNew && key.includes("PowerDistributionPanel")){
+		var tr = $('<tr></tr>').appendTo($('#pdp > tbody:last'));
+			$('<td></td>').text(key).appendTo(tr);
+			$('<td></td>').attr('id', NetworkTables.keyToId(key))
+						   .text(value)
+						   .appendTo(tr);
+	}
+	
+	if (key.includes("PowerDistributionPanel")){	
+		$('#' + NetworkTables.keySelector(key)).text(value);
+	}
+	
+	switch(key){
+	case("/LiveWindow/Ungrouped/PowerDistributionPanel[0]/Voltage"):
+		$('#voltage').text(value);
+		break;
+	
+	case("/SmartDashboard/robotState"):
+		$('#state').text(value);
+		if (value == "auton"){
+			var img1 = document.getElementById('cam1')
+			var img2 = document.getElementById('cam2')
+			var autonCam = document.getElementById('autonCam')
+			if (autonCam == "1"){
+				img1.src = "";
+			}
+			if (autonCam == "2"){
+				img2.src = "";
+			}
+		}else{
+			changeValues();
+		}
+		break;
+	case ("/SmartDashboard/enabledState"):
+		$('#enabledState').text(value)
+		break;
+	case("/SmartDashboard/match time"):
+		$('#matchTime').text(value)
+		//$('#timer').text(value <= 0 ? '0:00' : Math.floor(value / 60) + ':' + (value % 60 < 10 ? '0' : '') + value % 60)
+		
+		$('#matchTime').text(value <= 0 ? '0:00' : Math.floor(value / 60) + ':' + (value % 60 < 10 ? '0' : '') + value % 60)
+			//ui.timer.className = value == 0 ? '' : (value <= 10 ? 'blink' : (value <= 30 ? 'low' : (value <= 90 ? 'med' : (value <= 135 ? 'high' : 'auto'))));
+			break;
+	
+	
+	}
+}
+
+function changeValues(){
+	var img1 = document.getElementById('cam1');
+	var img2 = document.getElementById('cam2');
+	var comp = document.getElementById('comp');
+	var fps = document.getElementById('myRange');
+	img1.src =  "http://10.2.45.6:1181/stream.mjpg?compression=" + comp.value + "&fps=" + fps.value;
+	img2.src =  "http://10.2.45.6:1182/stream.mjpg?compression=" + comp.value + "&fps=" + fps.value;
+	var output = document.getElementById("fps");
+	output.value = slider.value;
+}
+
+
+// Update the current slider value (each time you drag the slider handle)
+</script>
+<img id="cam1" src="http://10.2.45.6:1181/stream.mjpg" style="transform: rotate(180deg)">
+<img id="cam2" src="http://10.2.45.6:1182/stream.mjpg" style="transform: rotate(180deg)">
+
+<input id="comp" type="text" name="Compression" value="40" onchange="changeValues();">
+<input id="fps" type="text" name="FramesPerSecond" value="30" onchange="changeValues();">
+<input id="autonCam" type="text" name="AutonCam" value="0">
+
+
+<table id="pdp" border=1>
+	<tbody></tbody>
+</table>
+
+</body>
+</html>
