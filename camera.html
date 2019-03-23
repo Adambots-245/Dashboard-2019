@@ -56,6 +56,7 @@
   Match Time: <span CLASS="newtext" id="matchTime" >Unknown</span>
   Spear: <span id="spear">Unknown</span>
   Clamp: <span id="clamp">Unknown</span>
+  xAngle: <span id="xAngle">Unknown</span>
   <br/>
   <!-- Timer: <span id="timer">99:99</span><br/> -->
   
@@ -159,6 +160,10 @@ function onValueChanged(key, value, isNew) {
 			ele.style = "background-color:red";
 		}
 		break;
+		
+	case('/SmartDashboard/xAngle'):
+		$('#xAngle').text(value)
+		break
 	case("/SmartDashboard/robotState"):
 		$('#state').text(value);		
 		var ele = document.getElementById('state')
@@ -199,7 +204,7 @@ function onValueChanged(key, value, isNew) {
 		$('#matchTime').text(value)
 		//$('#timer').text(value <= 0 ? '0:00' : Math.floor(value / 60) + ':' + (value % 60 < 10 ? '0' : '') + value % 60)
 		
-		$('#matchTime').text(value <= 0 ? '0:00' : Math.floor(value / 60) + ':' + (value % 60 < 10 ? '0' : '') + value % 60)
+		$('#matchTime').text(value <= 0 ? '0:00' : Math.floor(value / 60) + ':' + Math.round((value % 60 < 10 ? '0' : '') + value % 60))
 			//ui.timer.className = value == 0 ? '' : (value <= 10 ? 'blink' : (value <= 30 ? 'low' : (value <= 90 ? 'med' : (value <= 135 ? 'high' : 'auto'))));
 			break;
 	
