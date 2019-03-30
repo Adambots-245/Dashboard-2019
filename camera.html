@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	
 
-
+	 
 	
 	<script type="text/javascript" src="gauge/jquery-min.js"></script>
 	<script type="text/javascript" src="gauge/jquery.transit.min.js"></script>	
@@ -18,7 +18,7 @@
 	
 
 </head>
-<body>
+<body style="background-color:black; color:white;">
 
 <!-- This starts the NetworkTables websocket, it can be accessed from multiple
      pages simultaneously -->
@@ -228,7 +228,7 @@ function changeValues(){
 <img id="cam1" src="http://10.2.45.6:1181/stream.mjpg" style="transform: rotate(180deg)">
 <img id="cam2" src="http://10.2.45.6:1182/stream.mjpg" style="transform: rotate(180deg)"><br/>
 
-<input id="comp" type="text" name="Compression" value="40" onchange="changeValues();">
+<input id="comp" type="text" name="Compression" value="10" onchange="changeValues();">
 <input id="fps" type="text" name="FramesPerSecond" value="30" onchange="changeValues();">
 <input id="autonCam" type="text" name="AutonCam" value="0">
 
