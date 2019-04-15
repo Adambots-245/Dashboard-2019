@@ -229,13 +229,47 @@ function changeValues(){
 
 
 // Update the current slider value (each time you drag the slider handle)
+function updateTextBox(sliderId, textBoxId){
+var slider = document.getElementById(sliderId);
+var textBox = document.getElementById(textBoxId);
+textBox.value = slider.value;
+}
+
+function updateSlider(sliderId, textBoxId){
+var textBox = document.getElementById(textBoxId);
+var slider = document.getElementById(sliderId);
+slider.value = textBox.value;
+}
+
 </script>
 <img id="cam1" src="http://10.2.45.6:1181/stream.mjpg" style="transform: rotate(180deg)">
-<img id="cam2" src="http://10.2.45.6:1182/stream.mjpg" style="transform: rotate(180deg)"><br/>
-
-<input id="comp" type="text" name="Compression" value="40" onchange="changeValues();">
-<input id="fps" type="text" name="FramesPerSecond" value="30" onchange="changeValues();">
-<input id="autonCam" type="text" name="AutonCam" value="0">
+<img id="cam2" src="http://10.2.45.6:1182/stream.mjpg" style="transform: rotate(180deg)">
+<br/>
+<!--
+Compression <input id="comp" type="range" name="Compression" value="40" min="0" max="100" step="1" onchange="changeValues(); updateTextBox('comp','compTextBox')">
+<input id="compTextBox" type="number" name="compText" value="40" min="0" max="100" style="width:3em" onchange="updateSlider('comp','compTextBox');">
+<br/>
+FPS <input id="fps" type="range" name="FramesPerSecond" value="30" min="1" max="30" step="1" onchange="changeValues(); updateTextBox('fps','fpsTextBox')">
+<input id="fpsTextBox" type="number" name="fpsText" value="30" min="1" max="30" style="width:3em" onchange="updateSlider('fps','fpsTextBox');">
+<br/>
+Auton Camera <input id="autonCam" type="text" name="AutonCam" value="0" style="width:1em">
+-->
+<table style="width:5em;border">
+	<tr>
+		<td>Compression</td>
+		<td><input id="comp" type="range" name="Compression" value="40" min="0" max="100" step="1" onchange="changeValues(); updateTextBox('comp','compTextBox')"></td>
+		<td><input id="compTextBox" type="number" name="compText" value="40" min="0" max="100" style="width:3em" onchange="updateSlider('comp','compTextBox');"></td>
+	</tr>
+	<tr>
+		<td>FPS</td>
+		<td><input id="fps" type="range" name="FramesPerSecond" value="30" min="1" max="30" step="1" onchange="changeValues(); updateTextBox('fps','fpsTextBox')"></td>
+		<td><input id="fpsTextBox" type="number" name="fpsText" value="30" min="1" max="30" style="width:3em" onchange="updateSlider('fps','fpsTextBox');"></td>
+	</tr>
+	<tr>
+		<td>Auton Camera</td>
+		<td><input id="autonCam" type="text" name="AutonCam" value="0" style="width:1em"></td>
+	</tr>
+</table> 
 
 
 <table id="pdp" border=1>
